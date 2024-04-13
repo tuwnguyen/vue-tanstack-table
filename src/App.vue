@@ -7,7 +7,7 @@ import TableTanstack from '@/components/TableTanstack.vue'
 </script>
 
 <template>
-  <TableOriginal />
+  <TableTanstack />
 </template>
 
 <style scoped>

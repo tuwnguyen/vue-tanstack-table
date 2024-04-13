@@ -1,5 +1,63 @@
 <script setup>
 import people from '@/mockDataPeople.json'
+import {h, ref} from 'vue'
+import EditButton from '@/components/EditButton.vue'
+
+import { 
+  useVueTable,
+  FlexRender,
+  getCoreRowModel,
+} from '@tanstack/vue-table'
+import { format } from 'date-fns';
+
+const columnsPeople = [
+  {
+    accessorKey: 'id',
+    header: 'ID',
+  },
+  {
+    accessorKey: 'first_name',
+    header: 'First Name',
+  },
+  {
+    accessorKey: 'last_name',
+    header: 'Last Name',
+  },
+  {
+    accessorFn: row => `${row.first_name} ${row.last_name}`,
+    header: 'Name',
+  },
+  {
+    accessorKey: 'email',
+    header: 'Email',
+  },
+  {
+    accessorKey: 'title',
+    header: 'Title',
+  },
+  {
+    accessorKey: 'role',
+    header: 'Role',
+  },
+  {
+    accessorKey: 'created_at',
+    header: 'Created',
+    cell: info => format(new Date(info.getValue()), 'MMM d, yyyy'),
+  },
+  {
+    accessorKey: 'edit',
+    header: ' ',
+    cell: ({row}) => h(EditButton, {id: row.original.id}),
+  },
+]
+
+const data = ref(people)
+const table = useVueTable({
+  data: data.value,
+  columns: columnsPeople,
+  getCoreRowModel: getCoreRowModel()
+})
+
 </script>
 
 <template>
@@ -9,65 +67,40 @@ import people from '@/mockDataPeople.json'
         <div class="inline-block min-w-full py-2 align-middle sm:px-6 lg:px-8">
           <table class="min-w-full divide-y divide-gray-300">
             <thead>
-              <tr>
-                <th
-                  scope="col"
+              <tr 
+                v-for="headerGroup
+                in table.getHeaderGroups()"
+                :key="headerGroup.id"
+              >
+                <th 
+                  v-for="header
+                  in headerGroup.headers"
+                  :key="header.id"
                   class="px-3 py-3.5 text-left text-sm font-semibold text-gray-900"
                 >
-                  First name
-                </th>
-                <th
-                  scope="col"
-                  class="px-3 py-3.5 text-left text-sm font-semibold text-gray-900"
-                >
-                  Last name
-                </th>
-                <th
-                  scope="col"
-                  class="px-3 py-3.5 text-left text-sm font-semibold text-gray-900"
-                >
-                  Email
-                </th>
-                <th
-                  scope="col"
-                  class="px-3 py-3.5 text-left text-sm font-semibold text-gray-900"
-                >
-                  Title
-                </th>
-                <th
-                  scope="col"
-                  class="px-3 py-3.5 text-left text-sm font-semibold text-gray-900"
-                >
-                  Role
-                </th>
-                <th scope="col" class="relative py-3.5 pl-3 pr-4 sm:pr-0">
-                  <span class="sr-only">Edit</span>
+                  <FlexRender
+                    :render="header.column.columnDef.header"
+                    :props="header.getContext()"
+                  >
+                  </FlexRender>
                 </th>
               </tr>
             </thead>
             <tbody class="divide-y divide-gray-200">
-              <tr v-for="person in people" :key="person.id">
-                <td class="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
-                  {{ person.first_name }}
-                </td>
-                <td class="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
-                  {{ person.last_name }}
-                </td>
-                <td class="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
-                  {{ person.email }}
-                </td>
-                <td class="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
-                  {{ person.title }}
-                </td>
-                <td class="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
-                  {{ person.role }}
-                </td>
+
+            </tbody>
+            <tbody class="divide-y divide-gray-200">
+              
+              <tr
+                v-for="row in table.getRowModel().rows"
+                :key="row.id"
+              >
                 <td
-                  class="relative whitespace-nowrap py-4 pl-3 pr-4 text-right text-sm font-medium sm:pr-0"
+                  v-for="cell in row.getVisibleCells()"
+                  :key="cell.id"
+                  class="whitespace-nowrap px-3 py-4 text-sm text-gray-500"
                 >
-                  <a href="#" class="text-indigo-600 hover:text-indigo-900"
-                    >Edit<span class="sr-only">, {{ person.name }}</span></a
-                  >
+                  <FlexRender :render="cell.column.columnDef.cell" :props="cell.getContext()"/>
                 </td>
               </tr>
             </tbody>
