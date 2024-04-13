@@ -16,4 +16,6 @@ npm install @tanstack/vue-table
 ```js
  getCoreRowModel()
  getPaginationRowModel()
+ getSortedRowModel()
+ getFilteredRowModel()
 ```

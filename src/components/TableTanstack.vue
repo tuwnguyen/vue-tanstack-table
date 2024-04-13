@@ -9,6 +9,7 @@ import {
   getCoreRowModel,
   getPaginationRowModel,
   getSortedRowModel,
+  getFilteredRowModel,
 } from '@tanstack/vue-table'
 import { format } from 'date-fns';
 
@@ -56,16 +57,23 @@ const columnsPeople = [
 ]
 
 const data = ref(people)
+
 const sorting = ref([])
+const filter = ref('')
+
 const table = useVueTable({
   data: data.value,
   columns: columnsPeople,
   getCoreRowModel: getCoreRowModel(),
   getPaginationRowModel: getPaginationRowModel(),
   getSortedRowModel: getSortedRowModel(),
+  getFilteredRowModel: getFilteredRowModel(),
   state: {
     get sorting() {
       return sorting.value
+    },
+    get globalFilter() {
+      return filter.value
     }
   },
   onSortingChange: updaterOrValue => {
@@ -84,9 +92,13 @@ const table = useVueTable({
 
 <template>
   <div class="px-4 sm:px-6 lg:px-8">
-    <div class="mt-8 flow-root">
+    <div class="mt-8 flow-root justify-center">
+      <h1 class="text-center uppercase text-indigo-500 text-2xl">Tanstack Data Table</h1>
       <div class="-mx-4 -my-2 overflow-x-auto sm:-mx-6 lg:-mx-8">
         <div class="inline-block min-w-full py-2 align-middle sm:px-6 lg:px-8">
+          <div class="my-4">
+            <input type="text" class="border border-solid border-indigo-500 rounded px-2 py-2" placeholder="Search" v-model="filter">
+          </div>
           <table class="min-w-full divide-y divide-gray-300">
             <thead>
               <tr 
