@@ -8,6 +8,7 @@ import {
   FlexRender,
   getCoreRowModel,
   getPaginationRowModel,
+  getSortedRowModel,
 } from '@tanstack/vue-table'
 import { format } from 'date-fns';
 
@@ -15,6 +16,7 @@ const columnsPeople = [
   {
     accessorKey: 'id',
     header: 'ID',
+    enableSorting: false,
   },
   {
     accessorKey: 'first_name',
@@ -49,15 +51,28 @@ const columnsPeople = [
     accessorKey: 'edit',
     header: ' ',
     cell: ({row}) => h(EditButton, {id: row.original.id}),
+    enableSorting: false,
   },
 ]
 
 const data = ref(people)
+const sorting = ref([])
 const table = useVueTable({
   data: data.value,
   columns: columnsPeople,
   getCoreRowModel: getCoreRowModel(),
   getPaginationRowModel: getPaginationRowModel(),
+  getSortedRowModel: getSortedRowModel(),
+  state: {
+    get sorting() {
+      return sorting.value
+    }
+  },
+  onSortingChange: updaterOrValue => {
+    sorting.value = typeof updaterOrValue === 'function'
+      ? updaterOrValue(sorting.value)
+      : updaterOrValue
+  },
   initialState: {
     pagination: {
       pageSize: 10
@@ -84,12 +99,18 @@ const table = useVueTable({
                   in headerGroup.headers"
                   :key="header.id"
                   class="px-3 py-3.5 text-left text-sm font-semibold text-gray-900"
+                  :class="{'cursor-pointer select-none': header.column.getCanSort()}"
+                  @click="header.column.getToggleSortingHandler()?.($event)"
                 >
                   <FlexRender
                     :render="header.column.columnDef.header"
                     :props="header.getContext()"
                   >
                   </FlexRender>
+                  {{ 
+                    // {asc: '⬆️', desc: '⬇️'}[header.column.getIsSorted()]
+                    {asc: '↑', desc: '↓'}[header.column.getIsSorted()]
+                  }}
                 </th>
               </tr>
             </thead>
