@@ -7,6 +7,7 @@ import {
   useVueTable,
   FlexRender,
   getCoreRowModel,
+  getPaginationRowModel,
 } from '@tanstack/vue-table'
 import { format } from 'date-fns';
 
@@ -55,7 +56,13 @@ const data = ref(people)
 const table = useVueTable({
   data: data.value,
   columns: columnsPeople,
-  getCoreRowModel: getCoreRowModel()
+  getCoreRowModel: getCoreRowModel(),
+  getPaginationRowModel: getPaginationRowModel(),
+  initialState: {
+    pagination: {
+      pageSize: 10
+    }
+  }
 })
 
 </script>
@@ -106,6 +113,48 @@ const table = useVueTable({
             </tbody>
           </table>
         </div>
+      </div>
+      <div class="mt-8 text-sm font-medium text-gray-900 dark:text-white">
+        Page {{ table.getState().pagination.pageIndex + 1 }} of {{ table.getPageCount() }} - {{ table.getFilteredRowModel().rows.length }}
+      </div>
+      <div class="mt-8">
+        <label for="countries" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Select page size</label>
+        <select id="countries" class="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-16 p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+        @change="e => table.setPageSize(e.target.value)">
+          <option >Choose page size</option>
+          <option value="5">5</option>
+          <option selected value="10">10</option>
+          <option value="15">15</option>
+          <option value="20">20</option>
+        </select>
+      </div>
+      <div class="space-x-4 mt-8">
+        <button 
+          class="border border-solid border-indigo-500 rounded px-2 py-2 hover:bg-indigo-500 hover:text-white disabled:opacity-50 disabled:cursor-not-allowed"
+          @click="table.setPageIndex(0)"
+        >
+          First Page
+        </button>
+        <button 
+          class="border border-solid border-indigo-500 rounded px-2 py-2 hover:bg-indigo-500 hover:text-white disabled:opacity-50 disabled:cursor-not-allowed"
+          @click="table.setPageIndex(table.getPageCount() - 1)"  
+        >
+          Last Page
+        </button>
+        <button 
+          class="border border-solid border-indigo-500 rounded px-2 py-2 hover:bg-indigo-500 hover:text-white disabled:opacity-50 disabled:cursor-not-allowed"
+          :disabled="!table.getCanPreviousPage()"
+          @click="table.previousPage()"  
+        >
+          Prev Page
+        </button>
+        <button 
+          class="border border-solid border-indigo-500 rounded px-2 py-2 hover:bg-indigo-500 hover:text-white disabled:opacity-50 disabled:cursor-not-allowed"
+          :disabled="!table.getCanNextPage()"
+          @click="table.nextPage()"  
+        >
+          Next Page
+        </button>
       </div>
     </div>
   </div>

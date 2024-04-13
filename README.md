@@ -13,5 +13,7 @@ npm install @tanstack/vue-table
 ## Using vue-tanstack-table
  - [Doc](https://tanstack.com/table/latest/docs/framework/vue/vue-table)
 
-
-
+```js
+ getCoreRowModel()
+ getPaginationRowModel()
+```
