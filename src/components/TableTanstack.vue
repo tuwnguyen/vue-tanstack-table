@@ -1,7 +1,5 @@
 <script setup>
-import people from '@/mockDataPeople.json'
-import {h, ref} from 'vue'
-import EditButton from '@/components/EditButton.vue'
+import {ref} from 'vue'
 
 import { 
   useVueTable,
@@ -13,57 +11,19 @@ import {
 } from '@tanstack/vue-table'
 import { format } from 'date-fns';
 
-const columnsPeople = [
-  {
-    accessorKey: 'id',
-    header: 'ID',
-    enableSorting: false,
-  },
-  {
-    accessorKey: 'first_name',
-    header: 'First Name',
-  },
-  {
-    accessorKey: 'last_name',
-    header: 'Last Name',
-  },
-  {
-    accessorFn: row => `${row.first_name} ${row.last_name}`,
-    header: 'Name',
-  },
-  {
-    accessorKey: 'email',
-    header: 'Email',
-  },
-  {
-    accessorKey: 'title',
-    header: 'Title',
-  },
-  {
-    accessorKey: 'role',
-    header: 'Role',
-  },
-  {
-    accessorKey: 'created_at',
-    header: 'Created',
-    cell: info => format(new Date(info.getValue()), 'MMM d, yyyy'),
-  },
-  {
-    accessorKey: 'edit',
-    header: ' ',
-    cell: ({row}) => h(EditButton, {id: row.original.id}),
-    enableSorting: false,
-  },
-]
+const props = defineProps({
+  data: Array,
+  columns: Array,
+})
 
-const data = ref(people)
+const data = ref(props.data)
 
 const sorting = ref([])
 const filter = ref('')
 
 const table = useVueTable({
   data: data.value,
-  columns: columnsPeople,
+  columns: props.columns,
   getCoreRowModel: getCoreRowModel(),
   getPaginationRowModel: getPaginationRowModel(),
   getSortedRowModel: getSortedRowModel(),
@@ -119,8 +79,7 @@ const table = useVueTable({
                     :props="header.getContext()"
                   >
                   </FlexRender>
-                  {{ 
-                    // {asc: '⬆️', desc: '⬇️'}[header.column.getIsSorted()]
+                  {{
                     {asc: '↑', desc: '↓'}[header.column.getIsSorted()]
                   }}
                 </th>
